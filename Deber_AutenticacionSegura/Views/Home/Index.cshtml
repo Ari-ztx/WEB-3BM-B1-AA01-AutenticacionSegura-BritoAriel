@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <p>Sesión iniciada como: <strong>@User.Identity.Name</strong></p>
+}
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <form asp-controller="Account" asp-action="Logout" method="post">
+        <button type="submit" class="btn btn-danger">
+            Cerrar sesión
+        </button>
+    </form>
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+@if (TempData["Success"] is string mensaje)
+{
+    <div class="alert alert-success">
+        @mensaje
+    </div>
+}
