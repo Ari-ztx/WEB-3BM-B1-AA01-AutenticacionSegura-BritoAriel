@@ -1,0 +1,8 @@
+@model IEnumerable<AdminUserViewModel>
+@{ ViewData["Title"] = "Administrar usuarios"; }
+<section class="container page-section"><div class="page-heading"><div><p class="eyebrow">ADMINISTRACIÓN</p><h1>Usuarios</h1><p>Consulta las cuentas y administra sus permisos y estado.</p></div></div><div class="card table-card"><div class="table-intro"><div><h2>Cuentas registradas</h2><p>Los cambios se aplican desde el servidor.</p></div></div><div class="table-scroll"><table><thead><tr><th scope="col">Usuario</th><th scope="col">Estado</th><th scope="col">Rol</th><th scope="col">Acciones</th></tr></thead><tbody>
+@foreach (var user in Model)
+{
+    <tr><td><strong>@user.FullName</strong><span class="table-email">@user.Email</span></td><td><span class="badge @(user.IsEnabled ? "badge-active" : "badge-disabled")">@(user.IsEnabled ? "Activa" : "Deshabilitada")</span></td><td><form asp-action="UpdateRole" method="post" class="table-form"><input type="hidden" name="userId" value="@user.Id" /><label class="sr-only" for="role-@user.Id">Rol de @user.Email</label><select id="role-@user.Id" name="role"><option value="Cliente" selected="@(user.Role == "Cliente")">Cliente</option><option value="Administrador" selected="@(user.Role == "Administrador")">Administrador</option></select><button type="submit" class="button button-small button-secondary">Guardar</button></form></td><td><form asp-action="UpdateStatus" method="post"><input type="hidden" name="userId" value="@user.Id" /><input type="hidden" name="isEnabled" value="@(!user.IsEnabled ? "true" : "false")" /><button type="submit" class="text-button">@(user.IsEnabled ? "Deshabilitar" : "Habilitar")</button></form></td></tr>
+}
+</tbody></table></div></div></section>

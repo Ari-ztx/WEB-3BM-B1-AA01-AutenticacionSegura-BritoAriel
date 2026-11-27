@@ -1,8 +1,10 @@
 using Deber_AutenticacionSegura.Data;
 using Deber_AutenticacionSegura.Models;
+using Deber_AutenticacionSegura.Services;
+using Deber_AutenticacionSegura.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Deber_AutenticacionSegura.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Agrega los controladores y las vistas MVC.
@@ -60,6 +62,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddScoped<AuthenticationService>();
+builder.Services.AddScoped<UserManagementService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 
 var app = builder.Build();
 
@@ -81,7 +85,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"
 );
-await 
-    IdentitySeeder.InitializeAsync(app.Services);
+await IdentitySeeder.InitializeAsync(app.Services, app.Configuration);
 
 app.Run();
+

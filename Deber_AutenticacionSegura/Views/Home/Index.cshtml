@@ -1,27 +1,23 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-@if (User.Identity?.IsAuthenticated == true)
-{
-    <p>Sesión iniciada como: <strong>@User.Identity.Name</strong></p>
-}
-@if (User.Identity?.IsAuthenticated == true)
-{
-    <form asp-controller="Account" asp-action="Logout" method="post">
-        <button type="submit" class="btn btn-danger">
-            Cerrar sesión
-        </button>
-    </form>
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-
-@if (TempData["Success"] is string mensaje)
-{
-    <div class="alert alert-success">
-        @mensaje
-    </div>
-}
+@{ ViewData["Title"] = "Inicio"; }
+<section class="container home-section">
+    <h1>Sistema del taller</h1>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <p>Bienvenido. Desde aquí puedes consultar tu información y cambiar tu contraseña.</p>
+        <div class="button-row">
+            <a class="button button-primary" asp-controller="Profile" asp-action="Index">Mi perfil</a>
+            @if (User.IsInRole("Administrador"))
+            {
+                <a class="button button-secondary" asp-controller="Admin" asp-action="Index">Administrar usuarios</a>
+            }
+        </div>
+    }
+    else
+    {
+        <p>Inicia sesión para acceder al sistema o crea una cuenta si todavía no tienes una.</p>
+        <div class="button-row">
+            <a class="button button-primary" asp-controller="Account" asp-action="Login">Iniciar sesión</a>
+            <a class="button button-secondary" asp-controller="Account" asp-action="Register">Registrarse</a>
+        </div>
+    }
+</section>

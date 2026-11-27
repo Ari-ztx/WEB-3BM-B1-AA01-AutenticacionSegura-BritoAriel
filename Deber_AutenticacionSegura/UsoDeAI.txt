@@ -1,0 +1,24 @@
+
+1. Abstracción (El "Filtro")
+
+Es quedarte solo con lo importante y olvidar los detalles complicados. Es crear un "molde" con lo básico que necesitas para tu programa.
+• Ejemplo de la vida real: Para usar un cajero automático, solo necesitas saber qué botones pisar. No necesitas saber cómo se conecta al banco por internet ni cómo cuenta los billetes por dentro.
+• Para decirlo fácil: "Es mostrarle al usuario el botón que hace la magia, ocultando todo el cableado aburrido que hay detrás".
+
+2. Encapsulamiento (La "Caja Fuerte")
+
+Es guardar los datos dentro de un objeto y protegerlos para que nadie desde afuera los cambie por error. Todo se maneja a través de "puertas" controladas.
+• Ejemplo de la vida real: Tu cuenta bancaria. Nadie puede llegar y cambiar el saldo con un lápiz. Tienes que usar una "puerta" (un retiro o depósito) para que el saldo cambie de forma segura.
+• Para decirlo fácil: "Es meter los datos en una caja fuerte para que nadie meta la mano directamente; si quieren algo, tienen que pedir permiso a los métodos del objeto".
+
+3. Herencia (El "Copiar y Pegar" inteligente)
+
+Es crear una clase nueva a partir de una que ya existe, para no tener que escribir el mismo código dos veces. La nueva clase hereda todo lo de la anterior y añade lo suyo.
+• Ejemplo de la vida real: Un Smart TV es un televisor. Hereda la pantalla y el control remoto del televisor viejo, pero añade Netflix y conexión a Internet.
+• Para decirlo fácil: "Es hacer que una clase hija herede los superpoderes de una clase padre, ahorrándonos el trabajo de volver a programar lo que ya funciona".
+
+4. Polimorfismo (El "Camaleón")
+
+Es la capacidad de que un mismo comando o botón funcione de forma diferente según quién lo reciba. Un solo nombre, muchas formas de actuar.
+• Ejemplo de la vida real: Si le dices "¡Corta!" a un peluquero, usará tijeras. Si se lo dices a un director de cine, detendrá la grabación. La orden es la misma, la acción cambia según la profesión.
+• Para decirlo fácil: "Es dar una sola orden general y dejar que cada objeto la ejecute a su propia manera".

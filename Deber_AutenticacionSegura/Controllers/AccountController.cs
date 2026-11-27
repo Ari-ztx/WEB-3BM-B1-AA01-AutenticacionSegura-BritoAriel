@@ -1,95 +1,92 @@
 using Deber_AutenticacionSegura.Models.ViewModels;
 using Deber_AutenticacionSegura.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Deber_AutenticacionSegura.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly AuthenticationService _authenticationService;
+    private readonly AuthenticationService _auth;
+    public AccountController(AuthenticationService auth) => _auth = auth;
 
-    public AccountController(
-        AuthenticationService authenticationService)
-    {
-        _authenticationService = authenticationService;
-    }
+    [HttpGet, AllowAnonymous]
+    public IActionResult Register() => View(new RegisterViewModel());
 
-    // Muestra el formulario.
-    [HttpGet]
-    public IActionResult Register()
-    {
-        return View();
-    }
-
-    // Recibe los datos del formulario.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        if (!ModelState.IsValid)
-        {
-            return View(model);
-        }
-
-        var result = await _authenticationService.RegisterAsync(model);
-
-        if (!result.Succeeded)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
-            return View(model);
-        }
-
-        TempData["Success"] = "Tu cuenta fue creada correctamente.";
-
-        return RedirectToAction("Index", "Home");
-    }
-    // Muestra el formulario de inicio de sesión.
-    [HttpGet]
-    public IActionResult Login()
-    {
-        return View();
+        if (!ModelState.IsValid) return View(model);
+        var result = await _auth.RegisterAsync(model);
+        if (!result.Succeeded) { AddErrors(result); return View(model); }
+        TempData["Success"] = "Cuenta creada. Ya puedes iniciar sesión.";
+        return RedirectToAction(nameof(Login));
     }
 
-// Recibe los datos del formulario.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
+    [HttpGet, AllowAnonymous]
+    public IActionResult Login(string? returnUrl = null) => View(new LoginViewModel { ReturnUrl = returnUrl });
+
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid) return View(model);
+        if (!await _auth.LoginAsync(model))
         {
+            ModelState.AddModelError(string.Empty, "No fue posible iniciar sesión. Revisa tus datos o inténtalo más tarde.");
             return View(model);
         }
-
-        var inicioCorrecto = await _authenticationService.LoginAsync(model);
-
-        if (!inicioCorrecto)
-        {
-            ModelState.AddModelError(
-                string.Empty,
-                "No fue posible iniciar sesión. Revisa tus datos o inténtalo más tarde."
-            );
-
-            return View(model);
-        }
-
-        TempData["Success"] = "Iniciaste sesión correctamente.";
-
-        return RedirectToAction("Index", "Home");
+        if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl)) return LocalRedirect(model.ReturnUrl);
+        return RedirectToAction("Index", "Profile");
     }
-    [HttpPost]
-    [Authorize]
-    [ValidateAntiForgeryToken]
+
+    [HttpPost, Authorize, ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await _authenticationService.LogoutAsync(User);
-
-        TempData["Success"] = "Cerraste sesión correctamente.";
-
+        await _auth.LogoutAsync(User);
         return RedirectToAction("Index", "Home");
     }
+
+    [HttpGet, AllowAnonymous]
+    public IActionResult ForgotPassword() => View(new ForgotPasswordViewModel());
+
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+    {
+        if (!ModelState.IsValid) return View(model);
+        await _auth.RequestPasswordResetAsync(model.Email);
+        return RedirectToAction(nameof(ForgotPasswordConfirmation));
+    }
+
+    [HttpGet, AllowAnonymous]
+    public IActionResult ForgotPasswordConfirmation() => View();
+
+    [HttpGet, AllowAnonymous, ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult ResetPassword(string? email, string? token)
+    {
+        Response.Headers["Referrer-Policy"] = "no-referrer";
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token)) return BadRequest("El enlace de recuperación no es válido.");
+        return View(new ResetPasswordViewModel { Email = email, Token = token });
+    }
+
+    [HttpPost, AllowAnonymous, ValidateAntiForgeryToken, ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+    public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+    {
+        Response.Headers["Referrer-Policy"] = "no-referrer";
+        if (!ModelState.IsValid) return View(model);
+        var result = await _auth.ResetPasswordAsync(model);
+        if (!result.Succeeded) { AddErrors(result); return View(model); }
+        return RedirectToAction(nameof(ResetPasswordConfirmation));
+    }
+
+    [HttpGet, AllowAnonymous]
+    public IActionResult ResetPasswordConfirmation() => View();
+    [HttpGet, AllowAnonymous]
+    public IActionResult AccessDenied() => View();
+
+    private void AddErrors(IdentityResult result)
+    {
+        foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, IdentityErrorMessages.Translate(error));
+    }
 }
+

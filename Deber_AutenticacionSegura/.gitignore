@@ -1,0 +1,11 @@
+# Compilaciones y archivos temporales
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.suo
+
+# Configuración local que pueda contener secretos
+appsettings.*.local.json
+secrets.json
